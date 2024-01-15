@@ -1,3 +1,5 @@
+// server.js
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -67,7 +69,10 @@ app.post('/register', async (req, res) => {
       password: hashedPassword,
     });
 
-    res.status(201).json({ success: true, message: 'User registered successfully' });
+    // Generate JWT token
+    const token = generateToken(username);
+
+    res.status(201).json({ success: true, message: 'User registered successfully', token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
@@ -85,3 +90,37 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+// Helper functions for JWT
+const jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret';
+
+function generateToken(username) {
+  return jwt.sign({ username }, jwtSecret, { expiresIn: '1h' });
+}
+
+function verifyToken(token) {
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    return decoded.username;
+  } catch (error) {
+    return null;
+  }
+}
+
+// authentication middleware
+function authenticateToken(req, res, next) {
+  const token = req.header('Authorization');
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const username = verifyToken(token);
+
+  if (!username) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  req.user = { username };
+  next();
+}
