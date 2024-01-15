@@ -1,25 +1,46 @@
-{% extends 'index.html' %}
+<!-- registration_form.html -->
 
-{% block title %}Register{% endblock %}
+<h2>Регистрация</h2>
 
-{% block content %}
-    <h2>Register</h2>
-    <form method="POST" action="{{ url_for('register') }}">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.username.label }}
-            {{ form.username(class="form-control") }}
-            {% for error in form.username.errors %}
-                <span style="color: red;">{{ error }}</span>
-            {% endfor %}
-        </div>
-        <div class="form-group">
-            {{ form.password.label }}
-            {{ form.password(class="form-control") }}
-            {% for error in form.password.errors %}
-                <span style="color: red;">{{ error }}</span>
-            {% endfor %}
-        </div>
-        <button type="submit" class="btn btn-primary">Register</button>
-    </form>
-{% endblock %}
+<!-- Форма регистрации -->
+<form id="registrationForm">
+  <!-- Ваши поля формы здесь -->
+
+  <button type="submit">Зарегистрироваться</button>
+</form>
+
+<!-- Кнопка входа через Google -->
+<div class="g-signin2" data-onsuccess="onGoogleSignIn"></div>
+
+<!-- Ваш JavaScript-код -->
+<script>
+  // Обработка успешного входа через Google
+  function onGoogleSignIn(googleUser) {
+    // Получаем профиль пользователя
+    var profile = googleUser.getBasicProfile();
+
+    // Отправляем данные на сервер для регистрации
+    fetch('http://localhost:3000/register/google', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: profile.getId(),
+        name: profile.getName(),
+        email: profile.getEmail(),
+        // Другие данные, которые вы хотите отправить
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Обработка ответа от сервера
+      console.log(data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
+
+  // Дополнительный JavaScript-код
+</script>
