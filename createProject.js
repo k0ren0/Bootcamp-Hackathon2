@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 // Function to create a directory
 function createDirectory(directoryPath) {
@@ -39,20 +40,47 @@ createFile('backend/server.js', `
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const knex = require('knex');
+const bcrypt = require('bcrypt');
+require('dotenv').config();
+
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Middleware for logging requests
+app.use((req, res, next) => {
+  console.log(\`[${new Date().toISOString()}] \${req.method} \${req.url}\`);
+  next();
+});
+
+// Knex configuration for PostgreSQL
+const db = knex({
+  client: 'pg',
+  connection: {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'your_username',
+    password: process.env.DB_PASSWORD || 'your_password',
+    database: process.env.DB_NAME || 'your_database_name',
+  },
+});
+
 // Set up routes
-const adminRoutes = require('./routes/adminRoutes');
-const trainerRoutes = require('./routes/trainerRoutes');
-const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes')(db, bcrypt);
+const trainerRoutes = require('./routes/trainerRoutes')(db, bcrypt);
+const userRoutes = require('./routes/userRoutes')(db, bcrypt);
 
 app.use('/admin', adminRoutes);
 app.use('/trainer', trainerRoutes);
 app.use('/user', userRoutes);
+
+// Middleware for handling errors
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something went wrong!');
+});
 
 // Start the server
 const PORT = process.env.PORT || 3000;
@@ -64,14 +92,32 @@ app.listen(PORT, () => {
 // Create controller files
 createFile('backend/controllers/adminController.js', `
 // Admin controller logic goes here
+module.exports = (db, bcrypt) => {
+  return {
+    getStatistics: (req, res) => {
+      // Implement logic to fetch and return statistics
+      res.json({ message: 'Admin statistics' });
+    },
+  };
+};
 `);
 
 createFile('backend/controllers/trainerController.js', `
 // Trainer controller logic goes here
+module.exports = (db, bcrypt) => {
+  return {
+    // Implement trainer controller methods
+  };
+};
 `);
 
 createFile('backend/controllers/userController.js', `
 // User controller logic goes here
+module.exports = (db, bcrypt) => {
+  return {
+    // Implement user controller methods
+  };
+};
 `);
 
 // Create model files
@@ -97,10 +143,10 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 
-// Define admin routes here
-router.get('/statistics', adminController.getStatistics);
-
-module.exports = router;
+module.exports = (db, bcrypt) => {
+  router.get('/statistics', adminController(db).getStatistics);
+  return router;
+};
 `);
 
 createFile('backend/routes/trainerRoutes.js', `
@@ -108,10 +154,11 @@ const express = require('express');
 const router = express.Router();
 const trainerController = require('../controllers/trainerController');
 
-// Define trainer routes here
-// Example: router.get('/trainers', trainerController.getTrainers);
-
-module.exports = router;
+module.exports = (db, bcrypt) => {
+  // Define trainer routes here
+  // Example: router.get('/trainers', trainerController(db).getTrainers);
+  return router;
+};
 `);
 
 createFile('backend/routes/userRoutes.js', `
@@ -119,10 +166,11 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 
-// Define user routes here
-// Example: router.get('/classes', userController.getClasses);
-
-module.exports = router;
+module.exports = (db, bcrypt) => {
+  // Define user routes here
+  // Example: router.get('/classes', userController(db).getClasses);
+  return router;
+};
 `);
 
 // Create frontend files
@@ -165,6 +213,45 @@ createFile('frontend/user/user.js', `
 // Create database files
 createFile('database/db.js', `
 // Database connection logic goes here
+const knex = require('knex');
+require('dotenv').config();
+
+const db = knex({
+  client: 'pg',
+  connection: {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'your_username',
+    password: process.env.DB_PASSWORD || 'your_password',
+    database: process.env.DB_NAME || 'your_database_name',
+  },
+});
+
+module.exports = db;
+`);
+
+// Create .env file
+createFile('.env', `
+# Database configuration
+DB_HOST=localhost
+DB_USER=your_username
+DB_PASSWORD=your_password
+DB_NAME=your_database_name
+
+# Port for the server
+PORT=3000
+`);
+
+// Create .gitignore file
+createFile('.gitignore', `
+# Node.js
+node_modules/
+
+# Dependency directories
+/*/node_modules
+/node_modules
+
+# dotenv environment variables file
+.env
 `);
 
 // Log the completion message
