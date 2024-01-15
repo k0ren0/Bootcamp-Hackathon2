@@ -1,8 +1,12 @@
-module.exports = (db, bcrypt) => {
-  return {
-    getStatistics: (req, res) => {
-      // Implement logic to fetch and return statistics
-      res.json({ message: 'Admin statistics' });
-    },
-  };
+const express = require('express');
+const router = express.Router();
+
+module.exports = (db, bcrypt, jwt) => {
+  router.get('/dashboard', (req, res) => {
+    // Ваш код обработки запроса для страницы 'dashboard'
+  });
+
+  // Добавьте другие роуты по необходимости
+
+  return router;
 };
