@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 // Set up routes
 const adminRoutes = require('./routes/adminRoutes')(db, bcrypt);
 const trainerRoutes = require('./routes/trainerRoutes')(db, bcrypt);
-const userRoutes = require('./routes/userRoutes');  // Remove the passing of bcrypt and jwt here
+const userRoutes = require('./routes/userRoutes');  
 const classesRoutes = require('./routes/classesRoutes')(db);
 const registrationsRoutes = require('./routes/registrationsRoutes')(db);
 
