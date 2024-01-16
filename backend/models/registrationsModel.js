@@ -1,21 +1,19 @@
-module.exports = (db) => {
+module.exports = (knex) => {
   return {
-    registerForClass: async (userId, classId) => {
+    getAvailableClasses: async () => {
       try {
-        return await db('registrations').insert({ user_id: userId, class_id: classId });
+        return await knex('classes').where({ status: 'available' }).select('*');
       } catch (error) {
         throw error;
       }
     },
 
-    getAllRegistrations: async () => {
+    registerUserForClass: async (userId, classId) => {
       try {
-        return await db('registrations').select('*');
+        return await knex('user_classes').insert({ user_id: userId, class_id: classId });
       } catch (error) {
         throw error;
       }
     },
-
-
   };
 };

@@ -1,15 +1,8 @@
-module.exports = (db) => {
+module.exports = (knex) => {
     return {
       getAvailableClasses: async () => {
         try {
-
-          const currentDate = new Date();
-          const availableClasses = await db('classes')
-            .select('*')
-            .where('time', '>', currentDate)
-            .orderBy('time', 'asc');
-  
-          return availableClasses;
+          return await knex('classes').where({ status: 'available' }).select('*');
         } catch (error) {
           throw error;
         }
@@ -17,13 +10,11 @@ module.exports = (db) => {
   
       registerUserForClass: async (userId, classId) => {
         try {
-          
-          return await db('registrations').insert({ user_id: userId, class_id: classId });
+          return await knex('user_classes').insert({ user_id: userId, class_id: classId });
         } catch (error) {
           throw error;
         }
       },
-    
     };
   };
   

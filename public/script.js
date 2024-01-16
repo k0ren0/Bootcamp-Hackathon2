@@ -2,20 +2,18 @@ function getAuthToken() {
   return localStorage.getItem('token');
 }
 
-// Declare the loadContent function in the global scope
 window.loadContent = async (page) => {
   try {
     const response = await fetch(page);
     const content = await response.text();
     document.getElementById('contentContainer').innerHTML = content;
-    // Check authentication status after loading content
+
     updateNavigationLinks();
   } catch (error) {
     console.error('Error loading content:', error.message);
   }
 };
 
-// Update navigation links visibility based on authentication status
 async function updateNavigationLinks() {
   try {
     const response = await fetch('http://localhost:3001/check-auth', {
@@ -44,7 +42,7 @@ async function updateNavigationLinks() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Check authentication status on page load
+
   updateNavigationLinks();
 
   const registerButton = document.getElementById('registerButton');
@@ -63,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getAuthToken(),
         },
         body: JSON.stringify({
           username,
@@ -70,17 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }),
       });
 
-      const data = await response.json();
-
       if (response.ok) {
         console.log('Registration successful');
-        // Optionally, redirect to the profile page after successful registration
+        showNotification('Registration successful!');
         window.loadContent('./profile.html');
-        // Update navigation links after registration
         updateNavigationLinks();
       } else {
-        console.error('Registration failed:', data.error);
-        // Handle registration failure, e.g., show an error message
+        const data = await response.json();
+        console.error('Registration failed:', data.error || 'Unknown error');
+        showNotification('Registration failed: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error during registration:', error.message);
@@ -100,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getAuthToken(),
         },
         body: JSON.stringify({
           username,
@@ -107,24 +105,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }),
       });
 
-      const data = await response.json();
-
       if (response.ok) {
         console.log('Login successful');
-        // Optionally, redirect to the profile page after successful login
+        showNotification('Login successful!');
         window.loadContent('./profile.html');
-        // Update navigation links after login
         updateNavigationLinks();
       } else {
-        console.error('Login failed:', data.error);
-        // Handle login failure, e.g., show an error message
+        const data = await response.json();
+        console.error('Login failed:', data.error || 'Unknown error');
+        showNotification('Login failed: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error during login:', error.message);
     }
   });
 
-  // Event listeners for navigation links
   aboutLink.addEventListener('click', () => {
     window.loadContent('./about.html');
   });
@@ -141,16 +136,21 @@ document.addEventListener('DOMContentLoaded', () => {
         },
       });
       const data = await response.json();
-  
-      if (data.authenticated) {
 
+      if (data.authenticated) {
         window.loadContent('./profile.html');
       } else {
-
         window.loadContent('./register.html');
       }
     } catch (error) {
       console.error('Error checking authentication status:', error.message);
     }
   });
+
+  function showNotification(message) {
+    const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+    const notificationModalBody = document.getElementById('notificationModalBody');
+    notificationModalBody.textContent = message;
+    notificationModal.show();
+  }
 });
