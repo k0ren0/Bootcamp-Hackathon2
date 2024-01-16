@@ -1,5 +1,3 @@
-// server.js
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -37,60 +35,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Set up routes
-const adminRoutes = require('./routes/adminRoutes')(db, bcrypt);
-const trainerRoutes = require('./routes/trainerRoutes')(db, bcrypt);
-const userRoutes = require('./routes/userRoutes');  
-const classesRoutes = require('./routes/classesRoutes')(db);
-const registrationsRoutes = require('./routes/registrationsRoutes')(db);
-
-app.use('/admin', adminRoutes);
-app.use('/trainer', trainerRoutes);
-app.use('/users', userRoutes);
-app.use('/classes', classesRoutes);
-app.use('/registrations', registrationsRoutes);
-
-// User registration endpoint
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-
-  // Check if username and password are provided
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required' });
-  }
-
-  try {
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Insert the new user into the database
-    await db('users').insert({
-      username: username,
-      password: hashedPassword,
-    });
-
-    // Generate JWT token
-    const token = generateToken(username);
-
-    res.status(201).json({ success: true, message: 'User registered successfully', token });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Middleware for handling errors
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something went wrong!');
-});
-
-// Start the server
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
 // Helper functions for JWT
 const jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret';
 
@@ -124,3 +68,74 @@ function authenticateToken(req, res, next) {
   req.user = { username };
   next();
 }
+
+// Serve login page
+app.get('/login', (req, res) => {
+  res.sendFile(__dirname + '/login.html');
+});
+
+// Handle login request
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Perform authentication logic here using bcrypt and JWT
+  // For simplicity, assuming a user with the given username exists in the database
+  // and checking the password
+
+  const user = await db('users').where({ username }).first();
+
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+
+  // If authentication is successful, generate JWT token and send it in the response
+  const token = generateToken(username);
+  res.json({ success: true, message: 'Login successful', token });
+});
+
+// Serve registration page
+app.get('/register', (req, res) => {
+  res.sendFile(__dirname + '/register.html');
+});
+
+// Handle registration request
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Check if username and password are provided
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required' });
+  }
+
+  try {
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert the new user into the database
+    await db('users').insert({
+      username: username,
+      password: hashedPassword,
+    });
+
+    // Generate JWT token
+    const token = generateToken(username);
+
+    res.status(201).json({ success: true, message: 'User registered successfully', token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Serve profile page
+app.get('/profile', authenticateToken, (req, res) => {
+  // Render or send user profile information based on authentication
+  res.sendFile(__dirname + '/profile.html');
+});
+
+
+// Start the server
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

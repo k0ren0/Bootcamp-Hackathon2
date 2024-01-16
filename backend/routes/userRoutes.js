@@ -5,7 +5,7 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const authenticateToken = require('../middleware/authenticateToken');
 
-// Защитите маршруты, требующие аутентификации, с использованием middleware
+
 router.get('/dashboard', authenticateToken, (req, res) => userController(req.app.get('db')).dashboard(req, res));
 router.get('/available-classes', authenticateToken, (req, res) => userController(req.app.get('db')).getAvailableClasses(req, res));
 router.post('/register-for-class', authenticateToken, (req, res) => userController(req.app.get('db')).registerForClass(req, res));

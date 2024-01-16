@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="script.js" defer></script>
+  <title>Fitness App</title>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+    <a class="navbar-brand" href="#">
+      <img src="./source/png-transparent-physical-fitness-logo-men-s-fitness-physical-exercise-weight-training-fitness-miscellaneous-physical-fitness-fitness.png" width="60" height="60" alt="logo">
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:loadContent('about.html')">About us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:loadContent('schedule.html')">Schedule</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:loadContent('profile.html')">Profile</a>
+        </li>
+        <!-- Add navigation links for Login and Register with unique IDs -->
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:loadContent('login.html')" id="loginLink" style="display: none;">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:loadContent('register.html')" id="registerLink" style="display: none;">Register</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container mt-4" id="contentContainer">
+    <!-- Content will be loaded here dynamically -->
+  </div>
+
+  <!-- Registration Modal -->
+  <div class="modal" id="registrationModal" tabindex="-1" role="dialog">
+    <!-- ... (unchanged) -->
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal" tabindex="-1" role="dialog">
+    <!-- ... (unchanged) -->
+  </div>
+
+  <script>
+    // Update navigation links visibility based on authentication status
+    function updateNavigationLinks(authenticated) {
+      const loginLink = document.getElementById('loginLink');
+      const registerLink = document.getElementById('registerLink');
+
+      if (authenticated) {
+        loginLink.style.display = 'none';
+        registerLink.style.display = 'none';
+      } else {
+        loginLink.style.display = 'block';
+        registerLink.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+
+</html>
