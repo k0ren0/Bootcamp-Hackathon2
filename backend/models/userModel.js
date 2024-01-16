@@ -11,6 +11,6 @@ module.exports = (db) => {
       }
     },
     
-    // Add other user-related model methods here
+
   };
 };

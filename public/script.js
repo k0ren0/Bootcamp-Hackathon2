@@ -143,10 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await response.json();
   
       if (data.authenticated) {
-        // If the user is authenticated, load the profile
+
         window.loadContent('./profile.html');
       } else {
-        // If the user is not authenticated, load the registration form
+
         window.loadContent('./register.html');
       }
     } catch (error) {

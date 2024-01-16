@@ -3,7 +3,7 @@ module.exports = (db) => {
 
   return {
     dashboard: (req, res) => {
-      // Implement logic for user dashboard
+
       res.json({ message: 'User Dashboard' });
     },
 
@@ -21,10 +21,7 @@ module.exports = (db) => {
       const { classId } = req.body;
 
       try {
-        // Implement logic to check if the user is allowed to register for the class
-        // (e.g., check for availability, user's existing registrations, etc.)
-
-        // Assuming the user is allowed to register, you can add the registration to the database
+      
         await classModel.registerUserForClass(req.user.id, classId);
 
         res.json({ message: 'Successfully registered for the class' });
@@ -47,7 +44,7 @@ module.exports = (db) => {
       }
     },
     getAllUsers: async (req, res) => {
-      console.log('Request to getAllUsers received'); // Добавлено для отслеживания запросов
+      console.log('Request to getAllUsers received'); 
       try {
         const users = await db('users').select('*');
         res.json({ users });

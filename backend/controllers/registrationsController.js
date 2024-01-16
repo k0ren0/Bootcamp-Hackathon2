@@ -16,10 +16,7 @@ module.exports = (db) => {
         const { userId, classId } = req.body;
   
         try {
-          // Implement logic to check if the user is allowed to register for the class
-          // (e.g., check for availability, user's existing registrations, etc.)
-  
-          // Assuming the user is allowed to register, you can add the registration to the database
+       
           await registrationsModel.registerUserForClass(userId, classId);
   
           res.json({ message: 'Successfully registered for the class' });
@@ -29,7 +26,7 @@ module.exports = (db) => {
         }
       },
   
-      // Add more controller methods as needed
+
     };
   };
   

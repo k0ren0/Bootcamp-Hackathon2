@@ -1,4 +1,4 @@
-// trainerRoutes.js
+
 const express = require('express');
 const router = express.Router();
 const trainerController = require('../controllers/trainerController');
@@ -13,7 +13,7 @@ module.exports = (db, bcrypt, jwt) => {
     console.log('Request to /trainers received');
     userController(req.app.get('db')).getAllUsers(req, res);
   });
-  // Add more routes as needed
+
   return router;
 };
 

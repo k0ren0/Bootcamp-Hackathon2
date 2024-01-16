@@ -27,17 +27,16 @@
   <!-- Your login modal (if needed) -->
 
   <script>
-    // Fetch and insert the navbar template
+
     document.addEventListener('DOMContentLoaded', async () => {
       const response = await fetch('navbar-template.html');
       const navbarContent = await response.text();
       document.getElementById('navbarContainer').innerHTML = navbarContent;
 
-      // Update navigation links visibility based on authentication status
+  
       updateNavigationLinks();
     });
 
-    // Update navigation links visibility based on authentication status
     function updateNavigationLinks(authenticated) {
       const loginLink = document.getElementById('loginLink');
       const registerLink = document.getElementById('registerLink');

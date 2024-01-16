@@ -30,6 +30,7 @@ const db = knex({
     user: process.env.DB_USER || 'your_username',
     password: process.env.DB_PASS || 'your_password',
     database: process.env.DB_NAME || 'your_database_name',
+    port: process.env.DB_PORT || "PORT"
   },
 });
 
@@ -70,29 +71,70 @@ function authenticateToken(req, res, next) {
   next();
 }
 
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await db('users').where({ id }).first();
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
+
+passport.use(new LocalStrategy(
+  async function (username, password, done) {
+    try {
+      const user = await db('users').where({ username }).first();
+
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (!passwordMatch) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
+  }
+));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.post('/login',
+  passport.authenticate('local', {
+    failureRedirect: '/login',
+    successRedirect: '/profile',
+  }));
+
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await db('users').insert({ username, password: hashedPassword });
+
+    res.redirect('/login');
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
 });
 
-passport.use(new LocalStrategy(
-  function (username, password, done) {
-    // Implement your local authentication logic here
-  }
-));
-
-app.post('/login',
-  passport.authenticate('local', { failureRedirect: '/login' }),
-  (req, res) => {
-    res.redirect('/profile');
-  });
-
 app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'register.html'));
-});
-
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  // Implement your registration logic here
 });
 
 app.get('/profile', authenticateToken, (req, res) => {

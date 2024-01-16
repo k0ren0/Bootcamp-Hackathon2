@@ -27,6 +27,6 @@ module.exports = (db) => {
       }
     },
 
-    // Add more controller methods as needed
+
   };
 };

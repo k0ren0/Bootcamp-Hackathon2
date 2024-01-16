@@ -1,4 +1,4 @@
-<!-- registration.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fitness App - Register</title>
-  <!-- Include the common navbar and styles -->
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
@@ -16,28 +16,27 @@
 
 <body>
 
-  <!-- Include the navbar template -->
   <div id="navbarContainer"></div>
 
   <div class="container mt-4" id="contentContainer">
     <h2>Registration</h2>
-    <!-- Your registration form content -->
+
   </div>
 
-  <!-- Your registration modal (if needed) -->
+
 
   <script>
-    // Fetch and insert the navbar template
+
     document.addEventListener('DOMContentLoaded', async () => {
       const response = await fetch('navbar-template.html');
       const navbarContent = await response.text();
       document.getElementById('navbarContainer').innerHTML = navbarContent;
 
-      // Update navigation links visibility based on authentication status
+
       updateNavigationLinks();
     });
 
-    // Update navigation links visibility based on authentication status
+
     function updateNavigationLinks(authenticated) {
       const loginLink = document.getElementById('loginLink');
       const registerLink = document.getElementById('registerLink');

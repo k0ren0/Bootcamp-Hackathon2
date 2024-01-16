@@ -1,4 +1,4 @@
-// trainerController.js
+
 module.exports = (db) => {
   return {
     dashboard: (req, res) => {
@@ -7,7 +7,7 @@ module.exports = (db) => {
 
     getRegisteredUsers: async (req, res) => {
       try {
-        // Implement logic to fetch registered users
+
         const registeredUsers = await db('registrations')
           .select('users.*')
           .join('users', 'registrations.user_id', '=', 'users.id');
@@ -22,7 +22,7 @@ module.exports = (db) => {
       const userId = req.params.userId;
 
       try {
-        // Implement logic to fetch user by ID
+
         const user = await db('users').where({ id: userId }).first();
         res.json({ user });
       } catch (error) {
@@ -33,7 +33,7 @@ module.exports = (db) => {
 
     getUsersAndClasses: async (req, res) => {
       try {
-        // Implement logic to fetch users and classes
+
         const users = await db('users').select('*');
         const classes = await db('classes').select('*');
 
