@@ -1,3 +1,4 @@
+<!-- registration.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,30 +6,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fitness App - Register</title>
+  <!-- Include the common navbar and styles -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="script.js" defer></script>
 </head>
 
 <body>
 
-  <h2>Registration</h2>
+  <!-- Include the navbar template -->
+  <div id="navbarContainer"></div>
 
-  <!-- Add a radio button or checkbox for OAuth registration -->
-  <input type="radio" id="regularRegistration" name="registrationType" value="regular" checked>
-  <label for="regularRegistration">Regular Registration</label>
+  <div class="container mt-4" id="contentContainer">
+    <h2>Registration</h2>
+    <!-- Your registration form content -->
+  </div>
 
-  <input type="radio" id="oauthRegistration" name="registrationType" value="oauth">
-  <label for="oauthRegistration">OAuth Registration</label>
+  <!-- Your registration modal (if needed) -->
 
-  <!-- Other registration form fields (username, password, etc.) -->
-  <input type="text" id="username" name="username" placeholder="Username" required>
-  <input type="password" id="password" name="password" placeholder="Password" required>
+  <script>
+    // Fetch and insert the navbar template
+    document.addEventListener('DOMContentLoaded', async () => {
+      const response = await fetch('navbar-template.html');
+      const navbarContent = await response.text();
+      document.getElementById('navbarContainer').innerHTML = navbarContent;
 
-  <!-- Add fields for OAuth registration if needed -->
-  <input type="text" id="oauthUsername" name="oauthUsername" placeholder="OAuth Username">
-  <!-- Add other OAuth-related fields if needed -->
+      // Update navigation links visibility based on authentication status
+      updateNavigationLinks();
+    });
 
-  <button id="registerButton">Register</button>
+    // Update navigation links visibility based on authentication status
+    function updateNavigationLinks(authenticated) {
+      const loginLink = document.getElementById('loginLink');
+      const registerLink = document.getElementById('registerLink');
 
-  <script src="script.js" defer></script>
+      if (authenticated) {
+        loginLink.style.display = 'none';
+        registerLink.style.display = 'none';
+      } else {
+        loginLink.style.display = 'block';
+        registerLink.style.display = 'block';
+      }
+    }
+  </script>
 </body>
 
 </html>

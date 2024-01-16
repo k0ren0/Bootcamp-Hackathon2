@@ -6,7 +6,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const expressSession = require('express-session');
 const dotenv = require('dotenv');
+const path = require('path');
 
 // Загружаем переменные окружения из файла .env
 dotenv.config();
@@ -22,6 +24,13 @@ app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
+
+// Configure express-session
+app.use(expressSession({
+  secret: process.env.SESSION_SECRET || 'your_session_secret_key',
+  resave: false,
+  saveUninitialized: true,
+}));
 
 // Knex configuration for PostgreSQL
 const db = knex({
@@ -74,73 +83,45 @@ function authenticateToken(req, res, next) {
   next();
 }
 
+// Middleware to serve static files from the 'public' directory
+app.use(express.static('public'));
+
 // Serve login page
 app.get('/login', (req, res) => {
-  res.sendFile(__dirname + '/login.html');
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // Handle login request
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-
-  // Perform authentication logic here using bcrypt and JWT
-  // For simplicity, assuming a user with the given username exists in the database
-  // and checking the password
-
-  const user = await db('users').where({ username }).first();
-
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
-
-  // If authentication is successful, generate JWT token and send it in the response
-  const token = generateToken(username);
-  res.json({ success: true, message: 'Login successful', token });
+  // Add your login logic here
 });
 
 // Serve registration page
 app.get('/register', (req, res) => {
-  res.sendFile(__dirname + '/register.html');
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
 // Handle registration request
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
-
-  // Check if username and password are provided
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required' });
-  }
-
-  try {
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Insert the new user into the database
-    await db('users').insert({
-      username: username,
-      password: hashedPassword,
-    });
-
-    // Generate JWT token
-    const token = generateToken(username);
-
-    res.status(201).json({ success: true, message: 'User registered successfully', token });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+  // Add your registration logic here
 });
 
 // Serve profile page with authentication check
 app.get('/profile', authenticateToken, (req, res) => {
-  res.sendFile(__dirname + '/profile.html');
+  res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
+// Generic route to handle static files
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', req.url));
 });
 
 // Google OAuth Configuration
 passport.use(new GoogleStrategy({
-  clientID: 'YOUR_GOOGLE_CLIENT_ID',
-  clientSecret: 'YOUR_GOOGLE_CLIENT_SECRET',
+  clientID: process.env.GOOGLE_CLIENT_ID || 'your_google_client_id',
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your_google_client_secret',
   callbackURL: 'http://localhost:3001/auth/google/callback',
 },
 (accessToken, refreshToken, profile, done) => {
