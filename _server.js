@@ -9,6 +9,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const expressSession = require('express-session');
 const dotenv = require('dotenv');
 const path = require('path');
+const db = require('../database/db');
 
 dotenv.config();
 
@@ -19,24 +20,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressSession({
-  secret: process.env.SESSION_SECRET || 'your_session_secret_key',
+  secret: process.env.SESSION_SECRET || '23032303',
   resave: false,
   saveUninitialized: true,
 }));
 
-// Database setup
-const db = knex({
-  client: 'pg',
-  connection: {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'your_username',
-    password: process.env.DB_PASS || 'your_password',
-    database: process.env.DB_NAME || 'your_database_name',
-    port: process.env.DB_PORT || '5432',
-  },
-});
-
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   try {
     req.app.set('db', db);
     next();
@@ -46,20 +35,15 @@ app.use((req, res, next) => {
 });
 
 // JWT Setup
-const jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret';
+const jwtSecret = process.env.JWT_SECRET || '19841984';
 
 function generateToken(username) {
-  const token = jwt.sign({ username }, jwtSecret, { expiresIn: '1h' });
-  console.log('Generated token:', token);
-  return token;
+  return jwt.sign({ username }, jwtSecret, { expiresIn: '1h' });
 }
 
 function verifyToken(token) {
   try {
-    console.log('Attempting to verify token:', token);
-    const decoded = jwt.verify(token, jwtSecret);
-    console.log('Decoded token:', decoded);
-    return decoded.username;
+    return jwt.verify(token, jwtSecret);
   } catch (error) {
     console.error('Error verifying token:', error);
     return null;
@@ -74,13 +58,13 @@ function authenticateToken(req, res, next) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const username = verifyToken(token);
+  const decoded = verifyToken(token);
 
-  if (!username) {
+  if (!decoded || !decoded.username) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  req.user = { username };
+  req.user = { username: decoded.username };
   next();
 }
 
@@ -225,17 +209,24 @@ db.raw('SELECT 1+1 as result')
   .catch(error => console.error('Error connecting to database:', error))
   .finally(() => db.destroy());
 
-// Additional queries (commented out)
-db('users')
-  .select('*')
-  .then(rows => console.log(rows))
-  .catch(error => console.error(error))
-  .finally(() => db.destroy());
 
+  db.raw('SELECT 1+1 as result')
+  .then(() => {
+    console.log('Connection to database successful');
 
-// Additional queries (commented out)
-db('trainers')
-  .select('*')
-  .then(rows => console.log(rows))
-  .catch(error => console.error(error))
-  .finally(() => db.destroy());
+    // Select users
+    return db.select('*').from('users');
+  })
+  .then(users => {
+    console.log('Users:', users);
+
+    // Select trainers
+    return db.select('*').from('trainers');
+  })
+  .then(trainers => {
+    console.log('Trainers:', trainers);
+  })
+  .catch(error => console.error('Error:', error))
+  .finally(() => {
+    db.destroy();
+  });

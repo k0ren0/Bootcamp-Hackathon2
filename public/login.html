@@ -21,12 +21,12 @@
     <h2>Login</h2>
     <form id="loginForm">
       <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" class="form-control" id="username" name="username" required>
+        <label for="loginUsername">Username:</label>
+        <input type="text" class="form-control" id="loginUsername" name="loginUsername" required>
       </div>
       <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" class="form-control" id="password" name="password" required>
+        <label for="loginPassword">Password:</label>
+        <input type="password" class="form-control" id="loginPassword" name="loginPassword" required>
       </div>
       <button type="submit" class="btn btn-primary">Login</button>
     </form>
@@ -48,18 +48,28 @@
       const loginLink = document.getElementById('loginLink');
       const registerLink = document.getElementById('registerLink');
 
-      if (authenticated) {
-        loginLink.style.display = 'none';
-        registerLink.style.display = 'none';
-      } else {
-        loginLink.style.display = 'block';
-        registerLink.style.display = 'block';
+      if (loginLink && registerLink) {
+        if (authenticated) {
+          if (loginLink.style) {
+            loginLink.style.display = 'none';
+          }
+          if (registerLink.style) {
+            registerLink.style.display = 'none';
+          }
+        } else {
+          if (loginLink.style) {
+            loginLink.style.display = 'block';
+          }
+          if (registerLink.style) {
+            registerLink.style.display = 'block';
+          }
+        }
       }
     }
 
     async function handleLogin(event) {
       event.preventDefault();
-      // Обработка отправки формы входа, например, отправка данных на сервер
+      loadContent('./profile.html');
     }
   </script>
 </body>

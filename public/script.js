@@ -1,5 +1,6 @@
 function getAuthToken() {
-  return localStorage.getItem('token');
+  const token = localStorage.getItem('token');
+  console.log('Token from localStorage:', token);
 }
 
 window.loadContent = async (page) => {
@@ -18,7 +19,7 @@ async function updateNavigationLinks() {
   try {
     const response = await fetch('http://localhost:3001/check-auth', {
       headers: {
-        'Authorization': 'Bearer ' + getAuthToken(),
+        'Authorization': getAuthToken(),
       },
     });
     const data = await response.json();
@@ -53,6 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const profileLink = document.getElementById('profileLink');
 
   registerButton.addEventListener('click', async () => {
+    const authToken = getAuthToken();
+
+    if (!authToken) {
+      console.error('Invalid token');
+      return;
+    }
+
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
@@ -61,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + getAuthToken(),
+          'Authorization': authToken,
         },
         body: JSON.stringify({
           username,
@@ -84,11 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  googleLoginButton.addEventListener('click', () => {
-    window.location.href = 'http://localhost:3001/auth/google';
-  });
-
   loginButton.addEventListener('click', async () => {
+    const authToken = getAuthToken();
+
+    if (!authToken) {
+      console.error('Invalid token');
+      return;
+    }
+
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
 
@@ -97,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + getAuthToken(),
+          'Authorization': authToken,
         },
         body: JSON.stringify({
           username,
@@ -132,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const response = await fetch('http://localhost:3001/check-auth', {
         headers: {
-          'Authorization': 'Bearer ' + getAuthToken(),
+          'Authorization': getAuthToken(),
         },
       });
       const data = await response.json();
