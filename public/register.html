@@ -1,46 +1,34 @@
-<!-- registration_form.html -->
+<!DOCTYPE html>
+<html lang="en">
 
-<h2>Регистрация</h2>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App - Register</title>
+</head>
 
-<!-- Форма регистрации -->
-<form id="registrationForm">
-  <!-- Ваши поля формы здесь -->
+<body>
 
-  <button type="submit">Зарегистрироваться</button>
-</form>
+  <h2>Registration</h2>
 
-<!-- Кнопка входа через Google -->
-<div class="g-signin2" data-onsuccess="onGoogleSignIn"></div>
+  <!-- Add a radio button or checkbox for OAuth registration -->
+  <input type="radio" id="regularRegistration" name="registrationType" value="regular" checked>
+  <label for="regularRegistration">Regular Registration</label>
 
-<!-- Ваш JavaScript-код -->
-<script>
-  // Обработка успешного входа через Google
-  function onGoogleSignIn(googleUser) {
-    // Получаем профиль пользователя
-    var profile = googleUser.getBasicProfile();
+  <input type="radio" id="oauthRegistration" name="registrationType" value="oauth">
+  <label for="oauthRegistration">OAuth Registration</label>
 
-    // Отправляем данные на сервер для регистрации
-    fetch('http://localhost:3000/register/google', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        id: profile.getId(),
-        name: profile.getName(),
-        email: profile.getEmail(),
-        // Другие данные, которые вы хотите отправить
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Обработка ответа от сервера
-      console.log(data);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-  }
+  <!-- Other registration form fields (username, password, etc.) -->
+  <input type="text" id="username" name="username" placeholder="Username" required>
+  <input type="password" id="password" name="password" placeholder="Password" required>
 
-  // Дополнительный JavaScript-код
-</script>
+  <!-- Add fields for OAuth registration if needed -->
+  <input type="text" id="oauthUsername" name="oauthUsername" placeholder="OAuth Username">
+  <!-- Add other OAuth-related fields if needed -->
+
+  <button id="registerButton">Register</button>
+
+  <script src="script.js" defer></script>
+</body>
+
+</html>

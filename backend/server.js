@@ -4,7 +4,12 @@ const cors = require('cors');
 const knex = require('knex');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const dotenv = require('dotenv');
+
+// Загружаем переменные окружения из файла .env
+dotenv.config();
 
 const app = express();
 
@@ -51,10 +56,10 @@ function verifyToken(token) {
   }
 }
 
-// authentication middleware
+// Authentication middleware
 function authenticateToken(req, res, next) {
   const token = req.header('Authorization');
-  
+
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -127,12 +132,56 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Serve profile page
+// Serve profile page with authentication check
 app.get('/profile', authenticateToken, (req, res) => {
-  // Render or send user profile information based on authentication
   res.sendFile(__dirname + '/profile.html');
 });
 
+// Google OAuth Configuration
+passport.use(new GoogleStrategy({
+  clientID: 'YOUR_GOOGLE_CLIENT_ID',
+  clientSecret: 'YOUR_GOOGLE_CLIENT_SECRET',
+  callbackURL: 'http://localhost:3001/auth/google/callback',
+},
+(accessToken, refreshToken, profile, done) => {
+  // Save or retrieve user information from the database
+  return done(null, profile);
+}));
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((obj, done) => {
+  done(null, obj);
+});
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Authentication middleware to check if the user is authenticated
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/login');
+}
+
+// Route for initiating Google OAuth login
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] }));
+
+// Callback route after Google has authenticated the user
+app.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  (req, res) => {
+    res.redirect('/profile');
+  });
+
+// Additional route to check authentication status
+app.get('/check-auth', ensureAuthenticated, (req, res) => {
+  res.json({ authenticated: true });
+});
 
 // Start the server
 const PORT = process.env.PORT || 3001;
