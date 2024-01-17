@@ -225,7 +225,7 @@ db.raw('SELECT 1+1 as result')
   .catch(error => console.error('Error connecting to database:', error))
   .finally(() => db.destroy());
 
-// Additional queries (commented out)
+// Queries (users)
 db('users')
   .select('*')
   .then(rows => console.log(rows))
@@ -233,7 +233,7 @@ db('users')
   .finally(() => db.destroy());
 
 
-// Additional queries (commented out)
+// Queries (trainers)
 db('trainers')
   .select('*')
   .then(rows => console.log(rows))

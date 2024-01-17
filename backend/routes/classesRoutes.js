@@ -13,6 +13,6 @@ router.get('/', authenticateToken, (req, res) => {
   classController(req.app.get('db')).getAllClasses(req, res);
 });
 
-// Добавьте ваши текущие маршруты
+
 
 module.exports = router;
